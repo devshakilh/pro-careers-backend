@@ -1,0 +1,210 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Candidate {
+  id String @id @default(uuid())
+
+  name             String
+  gender           Gender?
+  nidNumber        String?
+  mobileNumber     String?
+  photoUrl         String?
+  email            String        @unique
+  password         String        @unique
+  role             String        @default("Candidate")
+  portfolioUrl     String?
+  facebookUrl      String?
+  linkedinUrl      String?
+  jobType          JobType?
+  presentAddress   String?
+  permanentAddress String?
+  careerObjective  String?
+  isComplete       Boolean?      @default(false)
+  educations       String?
+  experience       String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  applications     Application[]
+  savedJobs        SavedJob[]
+
+  @@map("candidates")
+}
+
+model Employee {
+  id                   String       @id @default(uuid())
+  name                 String
+  phoneNumber          String?
+  isComplete           Boolean?     @default(false)
+  email                String       @unique
+  password             String       @unique
+  photoUrl             String?
+  role                 String       @default("Employee")
+  website              String?
+  facebookUrl          String?
+  twitterUrl           String?
+  linkedinUrl          String?
+  companySize          CompanySize?
+  tin                  String?
+  tradeLicenseNumber   String?
+  address              String?
+  description          String?
+  recruiterName        String?
+  recruiterDesignation String?
+  recruiterNumber      String?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  jobs                 Job[]
+
+  @@map("employes")
+}
+
+model Job {
+  id                  String        @id @default(uuid())
+  title               String
+  positionSummery     String
+  jobResponsibilities String
+  qualification       String
+  requiredSkill       String
+  education           String
+  benefits            String
+  location            LocationType
+  companyName         String
+  salary              String
+  vacancy             String
+  jobCategory         JobCategory
+  deadline            String
+  type                Type
+  employeeId          String
+  employee            Employee      @relation(fields: [employeeId], references: [id])
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  applications        Application[]
+  savedJobs           SavedJob[]
+  comments            Comment[]
+
+  @@map("jobs")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  jobId     String
+  job       Job      @relation(fields: [jobId], references: [id])
+
+  @@map("comments")
+}
+
+model SavedJob {
+  id          String    @id @default(uuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+  jobId       String
+  job         Job       @relation(fields: [jobId], references: [id])
+
+  @@map("savedjob")
+}
+
+model Application {
+  id String @id @default(uuid())
+
+  candidateId String
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+  jobId       String
+  job         Job       @relation(fields: [jobId], references: [id])
+  assessment  String
+  coverLetter String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("applications")
+}
+
+model Courses {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  photoUrl    String
+  owner       String
+  price       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("courses")
+}
+
+model Orders {
+  id            String   @id @default(uuid())
+  transactionId String   @unique
+  buyerName     String
+  buyerEmail    String
+  buyerId       String
+  courseId      String
+  courseName    String
+  price         Int
+  paid          Boolean? @default(false)
+
+  @@map("orders")
+}
+
+enum JobType {
+  FullTime
+  Internship
+  PartTime
+}
+
+enum JobCategory {
+  SoftwareDevelopment
+  WebDevelopment
+  DataScience
+  NetworkAdministration
+  CyberSecurity
+  DatabaseAdministration
+  DevOps
+  CloudComputing
+  ITConsulting
+  SystemAnalysis
+  UIUXDesign
+  QualityAssurance
+  ITSupport
+  BusinessIntelligence
+  MobileAppDevelopment
+}
+
+enum Type {
+  FullTime
+  PartTime
+  Remote
+}
+
+enum LocationType {
+  Dhaka
+  Khulna
+  Chattogram
+  Barishal
+  Mymensingh
+  Rajshahi
+  Rangpur
+  Sylhet
+}
+
+enum CompanySize {
+  Small // Represents 1-50
+  Medium // Represents 51-100
+  Large // Represents 101 and above
+}
+
+enum Gender {
+  Male
+  Female
+  Others
+}
